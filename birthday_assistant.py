@@ -3,31 +3,33 @@ from collections import defaultdict
 
 
 def get_birthdays_per_week(users):
-    today = datetime.today().date()
-
+    birthdays_per_week = defaultdict(list)
     days_of_week = {
         0: 'Monday', 1: 'Tuesday', 2: 'Wednesday',
         3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'
     }
 
-    birthdays_per_week = defaultdict(list)
-
-    today_weekday = today.weekday()
+    today = datetime.today().date()
 
     for user in users:
         name = user["name"]
         birthday = user["birthday"].date()
+        birthday_this_year = birthday.replace(year=today.year)
 
-        delta_days = (birthday - today).days
-        day_of_week_index = (today_weekday + delta_days) % 7
-        day_of_week = days_of_week[day_of_week_index]
+        if birthday_this_year < today:
+            birthday_this_year = birthday.replace(year=today.year + 1)
 
-        birthdays_per_week[day_of_week].append(name)
+        delta_days = (birthday_this_year - today).days
 
-    for i in range(7):
-        day = days_of_week[(today_weekday + i) % 7]
-        if day in birthdays_per_week:
-            print(f"{day}: {', '.join(birthdays_per_week[day])}")
+        if delta_days < 7:
+            if birthday_this_year.weekday() >= 5:
+                birthdays_per_week[days_of_week[0]].append(name)
+            else:
+                birthdays_per_week[days_of_week[birthday_this_year.weekday()]
+                                   ].append(name)
+
+    for day, users_list in birthdays_per_week.items():
+        print(f"{day}: {', '.join(users_list)}")
 
 
 users = [
@@ -42,10 +44,10 @@ users = [
     {"name": "Matthew White", "birthday": datetime(1984, 12, 9)},
     {"name": "Olivia Anderson", "birthday": datetime(1991, 3, 22)},
     {"name": "Christopher Miller", "birthday": datetime(1975, 10, 14)},
-    {"name": "Sophia Martinez", "birthday": datetime(1986, 2, 9)},
-    {"name": "Joseph Taylor", "birthday": datetime(1992, 7, 7)},
-    {"name": "Elizabeth Harris", "birthday": datetime(1977, 6, 25)},
-    {"name": "Andrew Wilson", "birthday": datetime(1994, 8, 11)},
+    {"name": "Sophia Martinez", "birthday": datetime(1986, 10, 15)},
+    {"name": "Joseph Taylor", "birthday": datetime(1992, 10, 17)},
+    {"name": "Elizabeth Harris", "birthday": datetime(1977, 10, 18)},
+    {"name": "Andrew Wilson", "birthday": datetime(1994, 10, 13)},
     {"name": "Mykyta Moscalew", "birthday": datetime(2010, 2, 8)},
 ]
 
